@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const UserSchema = require('./user');
+const mongoose = require('mongoose')
 
 const MessageSchema = new mongoose.Schema({
     body: {
@@ -18,10 +17,9 @@ const MessageSchema = new mongoose.Schema({
     },
     readed: {
         type: Boolean,
-        required: true,
         default: false
     }
-}, {
+},{
     timestamps: true
 })
 

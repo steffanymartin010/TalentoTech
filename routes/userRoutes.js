@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const UserSchema = require('../models/User');
+const UserSchema = require('../models/user');
 const UserController = require('../controllers/UserController'); //Importando el controllador
 const multer = require('multer');
 const userController = new UserController(); // creando una instancia de ese controlador

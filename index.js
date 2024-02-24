@@ -12,8 +12,11 @@ const DB_URL = process.env.DB_URL || '';
 const mongoose = require('mongoose'); // Importo la libreria mongoose
 mongoose.connect(DB_URL) // Creo la cadena de conexion
 
-const userRoutes = require('./routes/UserRoutes');
+const userRoutes = require('./routes/userRoutes');
 const houseRoutes = require('./routes/HouseRoutes'); // Import
+const messageRoutes = require('./routes/MessageRoutes');
+
+const MessageSchema = require('./models/Message');
 
 //Metodo [GET, POST, PUT, PATCH, DELETE]
 // Nombre del servicio [/]
@@ -23,15 +26,27 @@ router.get('/', (req, res) => {
 })
 
 io.on('connect', (socket) => {
-    console.log('connected')
+    console.log("connected")
     //Escuchando eventos desde el servidor
     socket.on('message', (data) => {
-        console.log(data)
-        //Emitimos eventos hacia el cliente
-        socket.emit('message-receipt', {"Message": "Mensaje recibido en el servidor"})
+        /** Almacenando el mensaje en la BD */
+        var payload = JSON.parse(data)
+        console.log(payload)
+        /** Lo almaceno en la BD */
+        MessageSchema(payload).save().then((result) => {
+            /** Enviando el mensaje a todos los clientes conectados al websocket */
+            socket.broadcast.emit('message-receipt', payload)
+        }).catch((err) => {
+            console.log({"status" : "error", "message" :err.message})
+        })        
+    })
+
+    socket.on('disconnect', (socket) => {
+        console.log("disconnect")    
     })
 })
 
+//Configuraciones express
 app.use(express.urlencoded({extended: true})) // Acceder a la informacion de las urls
 app.use(express.json()) // Analizar informacion en formato JSON
 app.use((req, res, next) => {
@@ -44,6 +59,7 @@ app.use(router)
 app.use('/uploads', express.static('uploads'));
 app.use('/', userRoutes)
 app.use('/', houseRoutes)
+app.use('/', messageRoutes)
 http.listen(port, () => {
     console.log('Listen on ' + port)
 })
