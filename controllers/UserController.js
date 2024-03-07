@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const UserSchema = require('../models/User')
+const UserSchema = require('../models/user')
 const jwt = require('jsonwebtoken')
 require('dotenv').config() // Obtenmos las variables de entorno
 

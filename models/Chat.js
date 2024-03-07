@@ -21,7 +21,7 @@ const ChatSchema = new mongoose.Schema({
         required: true
     }
 }, {
-    timestamps: true //fecha y hora donde se crea el mensaje   
+    timestamps: true
 })
 
 module.exports = mongoose.model('chat', ChatSchema)

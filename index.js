@@ -7,14 +7,18 @@ const socket = require('socket.io'); // Importamos la libreria socket.io
 const http = require('http').Server(app);
 const io = socket(http);
 
-const DB_URL = process.env.DB_URL || '';
+//Importamos la libreria server de graphQL
+const { createYoga } = require('graphql-yoga');
+const schema = require('./graphql/schema')
 
+const DB_URL = process.env.DB_URL || '';
 const mongoose = require('mongoose'); // Importo la libreria mongoose
 mongoose.connect(DB_URL) // Creo la cadena de conexion
 
 const userRoutes = require('./routes/userRoutes');
 const houseRoutes = require('./routes/HouseRoutes'); // Import
 const messageRoutes = require('./routes/MessageRoutes');
+const departmentRoutes = require('./read_file');
 
 const MessageSchema = require('./models/Message');
 
@@ -54,12 +58,19 @@ app.use((req, res, next) => {
     next()
 })
 
+const yoga = new createYoga({ schema });
+app.use('/graphql', yoga);
+
 //Ejecuto el servidor
 app.use(router)
 app.use('/uploads', express.static('uploads'));
 app.use('/', userRoutes)
 app.use('/', houseRoutes)
 app.use('/', messageRoutes)
+app.use('/', departmentRoutes)
+
 http.listen(port, () => {
     console.log('Listen on ' + port)
 })
+
+module.exports = http
